@@ -30,21 +30,21 @@ int main(int argc, char* argv[]) {
 	}
 
 	OrderBookAggregator aggregator;
-	Coinbase cb;
-	Gemini gem;
+	Coinbase Coinbase_;
+	Gemini Gemini_;
 
-	aggregator.addExchange(&cb);
-	aggregator.addExchange(&gem);
+	aggregator.addExchange(&Coinbase_);
+	aggregator.addExchange(&Gemini_);
 
 	aggregator.fetchData(targetQty);
 
 
 
-	double buyCost = aggregator.calculateBuyCost(targetQty);
-	double sellRevenue = aggregator.calculateSellRevenue(targetQty);
-	std::cout<<std::fixed<<std::setprecision(2);
-	std::cout << "To buy "<< targetQty << " BTC: $" << buyCost << std::endl;
-	std::cout << "To sell " << targetQty << " BTC: $" << sellRevenue << std::endl;
+	double averageBuyCost = aggregator.calculateAverageBuyCost(targetQty);
+	double averageSellRevenue = aggregator.calculateAverageSellPrice(targetQty);
+
+	std::cout << "To buy "<< targetQty << " BTC: $" << averageBuyCost << std::endl;
+	std::cout << "To sell " << targetQty << " BTC: $" << averageSellRevenue << std::endl;
 
     return 0;
 }

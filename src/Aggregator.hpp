@@ -1,6 +1,7 @@
-
 #pragma once
 #include "core/Exchange.hpp"
+#include <algorithm>
+#include <iostream>
 
 class OrderBookAggregator {
 private:
@@ -21,16 +22,19 @@ public:
             ex->fetchOrderBook(all_bids, all_asks, targetQty);
         }
 
-        std::sort(all_bids.begin(), all_bids.end(), [](const Order& a, const Order& b) {
-            return a.price > b.price;
-        });
+        std::sort(all_bids.begin(), all_bids.end(),
+            [](const Order& a, const Order& b) {
+                return a.price > b.price;
+            });
 
-        std::sort(all_asks.begin(), all_asks.end(), [](const Order& a, const Order& b) {
-            return a.price < b.price;
-        });
+        std::sort(all_asks.begin(), all_asks.end(),
+            [](const Order& a, const Order& b) {
+                return a.price < b.price;
+            });
     }
 
-    // Calculate cost to BUY (Walking down Asks)
+    // ---------------- BUY SIDE ----------------
+
     double calculateBuyCost(double targetQty) {
         double totalCost = 0.0;
         double remainingQty = targetQty;
@@ -44,12 +48,40 @@ public:
         }
 
         if (remainingQty > 0) {
-            std::cerr << "Warning: Not enough liquidity to buy " << targetQty << " BTC." << std::endl;
+            std::cerr << "Warning: Not enough liquidity to buy "
+                      << targetQty << std::endl;
         }
+
         return totalCost;
     }
 
-    // Calculate revenue to SELL (Walking up Bids)
+    double calculateAverageBuyCost(double targetQty) {
+        double totalCost = 0.0;
+        double filledQty = 0.0;
+
+        for (const auto& order : all_asks) {
+            if (filledQty >= targetQty) break;
+
+            double takeQty = std::min(order.quantity, targetQty - filledQty);
+            totalCost += takeQty * order.price;
+            filledQty += takeQty;
+        }
+
+        if (filledQty == 0.0) {
+            std::cerr << "Error: No liquidity on buy side\n";
+            return 0.0;
+        }
+
+        if (filledQty < targetQty) {
+            std::cerr << "Warning: Partial fill on buy side ("
+                      << filledQty << "/" << targetQty << ")\n";
+        }
+
+        return totalCost / filledQty;
+    }
+
+    // ---------------- SELL SIDE ----------------
+
     double calculateSellRevenue(double targetQty) {
         double totalRevenue = 0.0;
         double remainingQty = targetQty;
@@ -63,8 +95,35 @@ public:
         }
 
         if (remainingQty > 0) {
-            std::cerr << "Warning: Not enough liquidity to sell " << targetQty << " BTC." << std::endl;
+            std::cerr << "Warning: Not enough liquidity to sell "
+                      << targetQty << std::endl;
         }
+
         return totalRevenue;
+    }
+
+    double calculateAverageSellPrice(double targetQty) {
+        double totalRevenue = 0.0;
+        double filledQty = 0.0;
+
+        for (const auto& order : all_bids) {
+            if (filledQty >= targetQty) break;
+
+            double takeQty = std::min(order.quantity, targetQty - filledQty);
+            totalRevenue += takeQty * order.price;
+            filledQty += takeQty;
+        }
+
+        if (filledQty == 0.0) {
+            std::cerr << "Error: No liquidity on sell side\n";
+            return 0.0;
+        }
+
+        if (filledQty < targetQty) {
+            std::cerr << "Warning: Partial fill on sell side ("
+                      << filledQty << "/" << targetQty << ")\n";
+        }
+
+        return totalRevenue / filledQty;
     }
 };
