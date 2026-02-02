@@ -1,0 +1,33 @@
+
+# Build folders
+
+build/
+
+Debug/
+
+Release/
+
+
+
+# Windows binaries
+
+*.exe
+
+*.dll
+
+*.lib
+
+*.pdb
+
+
+
+# IDE files
+
+.vscode/
+
+.idea/
+
+*.project
+
+*.cproject
+
