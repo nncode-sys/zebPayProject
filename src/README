@@ -1,0 +1,60 @@
+# C++ Order Book Aggregator
+
+## Overview
+
+This project is a **C++ Order Book Aggregator** that fetches order book data from multiple cryptocurrency exchanges and calculates the effective **buy and sell price** for a given target quantity.
+
+The design follows a modular architecture using interfaces, making it easy to extend the system with additional exchanges.
+
+⚠️ **Important**  
+This repository intentionally contains **source code only**.  
+Binary files (`.exe`, `.dll`, `.lib`, `.pdb`) are excluded to avoid:
+- Email antivirus blocking
+- ZIP extraction issues on client systems
+- OS- and compiler-specific incompatibilities
+
+---
+
+## Features
+
+- Aggregates order books from multiple exchanges
+- Calculates weighted average buy and sell prices
+- Clean and modular C++ design
+- Easy to extend with new exchanges
+- Uses `libcurl` for HTTP requests
+- Compatible with C++17
+
+---
+
+## Prerequisites
+
+### General
+- C++17 compatible compiler
+- Git
+
+### Windows
+- MinGW or MSYS2 (g++)
+- libcurl installed
+
+### Linux / WSL
+- g++
+- libcurl development package
+
+---
+
+## Installing libcurl
+
+### Ubuntu / WSL
+```bash
+sudo apt update
+sudo apt install libcurl4-openssl-dev
+
+
+## 🔧 Build Instructions
+
+### Linux / WSL
+```bash
+g++ -std=c++17 src/main.cpp -Iinclude -lcurl -o app
+
+
+
